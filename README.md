@@ -104,3 +104,7 @@ Este repositório não define uma licença de redistribuição neste momento. A 
 A varredura no aparelho revelou que canais fracos podiam retornar valores de 8 bits promovidos sem sinal (por exemplo, 254). O FM Lab interpreta 128–255 como −128 a −1 **antes** de calcular médias, cores ou ordenar candidatos. RSSI permanece no formato bruto original; isso não é uma conversão calibrada de unidade.
 
 Referências da implementação alvo: [estrutura e limites no kernel Iris](https://github.com/LineageOS/android_kernel_samsung_msm8930-common/blob/cm-14.1/include/media/radio-iris.h) e [leitura do campo SINR no driver](https://github.com/LineageOS/android_kernel_samsung_msm8930-common/blob/cm-14.1/drivers/media/radio/radio-iris.c). Há testes de regressão para impedir que um canal com SINR negativo seja classificado como excelente por esse motivo.
+
+### Validação da versão 0.5
+
+Foram executadas 83 verificações automatizadas e uma busca real no GT-I9195. O refinamento produziu candidatos com nome RDS e eventos reais de estéreo e mono. O teste também identificou e corrigiu a interpretação incorreta do SINR promovido sem sinal. Os resultados de frequência e qualidade variam por posição e não fazem parte dos dados distribuídos no repositório.
