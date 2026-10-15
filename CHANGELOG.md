@@ -1,0 +1,27 @@
+# Histórico de versões
+
+## 0.5
+
+- Eventos reais de recepção estéreo/mono e seleção estéreo automático/mono forçado.
+- Varredura rápida/completa, refinamento e ranking dos sinais captados.
+- Tela temporariamente ligada durante a busca, cancelamento e tentativa de restauração da sintonia.
+- Estrutura de projeto, documentação e scripts para publicação no GitHub.
+
+## 0.4
+
+- Favoritos, medições nomeadas de locais e registro/exportação CSV.
+- Espectro de áudio, indicação de nível baixo e picos digitais.
+- Atalhos de navegação e opção de manter a tela ligada.
+
+## 0.3
+
+- Interface em cartões, indicador colorido ajustável e leituras rápidas de RF.
+- Captura direta do áudio FM com osciloscópio e níveis RMS/pico.
+
+## 0.2
+
+- Inicialização do receptor pela tela nativa para contornar falha de Looper no comando Binder remoto.
+
+## 0.1
+
+- Prova inicial de conexão ao serviço, sintonia, RDS e leituras RSSI/SINR.
