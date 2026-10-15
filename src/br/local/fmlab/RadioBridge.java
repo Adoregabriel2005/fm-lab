@@ -5,7 +5,8 @@ import android.os.Parcel;
 import android.os.RemoteException;
 
 /** Protocol observed in the supplied eyltws.apk, version 25 / 7.1.2.
- * No system identity, reflection, direct device access, or callback replacement.
+ * Uses the observed service interface without system identity or reflection.
+ * Event registration uses the native service shared callback slot.
  */
 final class RadioBridge {
     static final String DESCRIPTOR = "com.caf.fmradio.IFMRadioService";
