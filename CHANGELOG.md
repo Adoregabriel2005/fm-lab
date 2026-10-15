@@ -1,5 +1,11 @@
 # Histórico de versões
 
+## 0.6
+
+- Sintonia de 76 a 108 MHz e varreduras ampla, convencional e somente eFM.
+- Testes dos limites e alinhamento dos canais de cada faixa.
+- Documentação de compatibilidade por modelo, ROM e capacidades do serviço nativo.
+
 ## 0.5
 
 - Eventos reais de recepção estéreo/mono e seleção estéreo automático/mono forçado.

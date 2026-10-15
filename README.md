@@ -6,7 +6,7 @@ O FM Lab usa o serviço do rádio nativo para controlar o sintonizador e consult
 
 ## Recursos
 
-- Sintonia de 87,5 a 108,0 MHz e favoritos com nomes.
+- Sintonia ampla de 76,0 a 108,0 MHz, incluindo FM estendido e favoritos com nomes.
 - RSSI e SINR brutos, histórico temporal e indicador de qualidade ajustável.
 - Leituras com alvo de 4, 10 ou 20 Hz; gráfico com alvo de 30 FPS.
 - RDS: nome, texto, PI, PTY e ECC quando recebidos.
@@ -38,8 +38,10 @@ O app tem identificador próprio (`br.local.fmlab`) e não substitui o rádio na
 
 Abra **Testes**, localize **Busca e comparação de emissoras** e toque em **Varrer FM**.
 
-- **Rápida:** 87,5–107,9 MHz, passo de 0,2 MHz.
-- **Completa:** 87,5–108,0 MHz, passo de 0,1 MHz.
+- Escolha a faixa: ampla **76–108 MHz**, convencional **87,5–108 MHz** ou somente eFM **76,1–87,3 MHz**.
+- **Rápida:** passo de 0,2 MHz, alinhado aos canais terminados em decimal ímpar (faixa ampla: 76,1–107,9 MHz).
+- **Completa:** passo de 0,1 MHz, incluindo os limites da faixa selecionada (faixa ampla: 76,0–108,0 MHz).
+- A escolha da faixa solicita sintonia ao serviço; ela não altera nem desbloqueia o firmware. Frequências recusadas pelo serviço não são tratadas como sinais recebidos.
 - Mantenha o aparelho e o cabo do fone parados. A tela permanece ligada durante a busca.
 - O áudio é temporariamente silenciado e o estéreo automático é habilitado.
 - A busca inicial mede três amostras por frequência; os até 12 candidatos com melhor resultado são revisitados, com mais tempo de estabilização e oito amostras cada.
@@ -80,7 +82,7 @@ Requisitos utilizados: JDK 25.0.3, Android SDK Platform 34 e Build Tools 36.0.0.
 .\build.ps1 -Sdk 'C:\Android\Sdk' -Java 'C:\Program Files\Android\Android Studio\jbr'
 ```
 
-Saída: `dist/FM-Lab-0.5-teste.apk`. Intermediários e chave local de desenvolvimento ficam em `.build/`, ignorados pelo Git. Um clone gera sua própria chave de testes; essa chave não substitui a assinatura dos APKs distribuídos. Para uma assinatura local existente, informe `-KeyStore 'C:\caminho\test-key.p12'` com a configuração de testes esperada pelo script. Não publique chaves privadas.
+Saída: `dist/FM-Lab-0.6-teste.apk`. Intermediários e chave local de desenvolvimento ficam em `.build/`, ignorados pelo Git. Um clone gera sua própria chave de testes; essa chave não substitui a assinatura dos APKs distribuídos. Para uma assinatura local existente, informe `-KeyStore 'C:\caminho\test-key.p12'` com a configuração de testes esperada pelo script. Não publique chaves privadas.
 
 ## Testes e arquitetura
 
@@ -108,3 +110,20 @@ Referências da implementação alvo: [estrutura e limites no kernel Iris](https
 ### Validação da versão 0.5
 
 Foram executadas 83 verificações automatizadas e uma busca real no GT-I9195. O refinamento produziu candidatos com nome RDS e eventos reais de estéreo e mono. O teste também identificou e corrigiu a interpretação incorreta do SINR promovido sem sinal. Os resultados de frequência e qualidade variam por posição e não fazem parte dos dados distribuídos no repositório.
+
+## FM estendido e compatibilidade
+
+A versão 0.6 aceita sintonia de 76,0 a 108,0 MHz e permite incluir o eFM na varredura. A aceitação real depende dos limites configurados no rádio nativo e do hardware. Se frequências abaixo de 87,5 MHz forem recusadas, confira as opções de região/faixa no rádio nativo; selecionar uma região japonesa pode também reduzir o limite superior, portanto não equivale automaticamente a habilitar toda a faixa 76–108 MHz. O FM Lab não escreve preferências privadas do aplicativo do sistema nem desbloqueia faixas no driver.
+
+| Situação | Compatibilidade |
+| --- | --- |
+| GT-I9195 / LineageOS 14.1 / Android 7.1.2 / serviço original analisado | Alvo testado |
+| Outro aparelho com o mesmo serviço CAF, protocolo e permissões | Possível candidato; ainda não validado |
+| Aparelho com outro serviço, chip ou firmware | Precisa de um backend compatível e testes próprios |
+| Aparelho sem sintonizador FM disponível ao sistema | O app não cria esse hardware |
+
+Ter FM integrado não garante acesso por um app separado. A versão atual continua verificando o pacote e a versão do serviço analisado; ela não remove essas verificações para fingir compatibilidade. Áudio, RDS, estéreo, faixa estendida e métricas são capacidades separadas e podem variar entre aparelhos. Para novos alvos, informe modelo exato, ROM, versão do Android e o serviço de rádio disponível.
+
+### Validação da versão 0.6
+
+Foram executadas 97 verificações automatizadas. No GT-I9195 testado, o serviço aceitou 76,1 MHz e o evento do driver confirmou `Tuned Frequency: 76100`. Não havia recepção útil confirmada nesse ponto de teste; aceitação da frequência não significa presença de emissora. A sintonia anterior foi restaurada depois da validação. Não foi executado um levantamento completo de emissoras da faixa estendida nesta validação.
