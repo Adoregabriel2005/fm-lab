@@ -12,7 +12,7 @@ final class BandScanner {
  void cancel(boolean restoreFrequency){restore=restoreFrequency;cancel=true;}
  static void sort(List<Result> a){Collections.sort(a,new Comparator<Result>(){public int compare(Result x,Result y){double sx=x.sn==0?-Double.MAX_VALUE:x.sinrMean(),sy=y.sn==0?-Double.MAX_VALUE:y.sinrMean();int c=Double.compare(sy,sx);if(c!=0)return c;c=Double.compare(x.sn==0?Double.MAX_VALUE:x.sinrSd(),y.sn==0?Double.MAX_VALUE:y.sinrSd());if(c!=0)return c;double rx=x.rn==0?-Double.MAX_VALUE:x.rssiMean(),ry=y.rn==0?-Double.MAX_VALUE:y.rssiMean();return Double.compare(ry,rx);}});}
  synchronized void start(final RadioBridge radio,final int original,final int step,final Listener l){if(running)return;running=true;cancel=false;restore=true;new Thread(new Runnable(){public void run(){scan(radio,original,step,l);}},"FM-Lab-Scan").start();}
- private Integer number(RadioBridge r,int code){try{int v=r.number(code,null);return RadioBridge.valid(v)?v:null;}catch(Exception e){return null;}}
+ private Integer number(RadioBridge r,int code){try{int v=r.number(code,null);return code==RadioBridge.SINR?RadioBridge.sinrValue(v):RadioBridge.valid(v)?v:null;}catch(Exception e){return null;}}
  private void waitMs(long ms)throws InterruptedException{long end=SystemClock.elapsedRealtime()+ms;while(!cancel&&SystemClock.elapsedRealtime()<end)Thread.sleep(Math.min(50,end-SystemClock.elapsedRealtime()+1));}
  private void scan(RadioBridge r,int original,int step,Listener l){List<Result> all=new ArrayList<Result>();String error="";boolean mutedByUs=false,restored=false;try{
   if(r.number(RadioBridge.IS_ON,null)==0)throw new IllegalStateException("Ligue o FM antes de varrer");

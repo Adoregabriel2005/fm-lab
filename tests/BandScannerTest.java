@@ -13,6 +13,8 @@ public class BandScannerTest {
   List<BandScanner.Result> stability=new ArrayList<BandScanner.Result>(Arrays.asList(strong,stableLowerRssi));BandScanner.sort(stability);
   check(stability.get(0)==stableLowerRssi,"lower SINR variation wins before higher RSSI");
   check(Math.abs(strong.sinrSd()-1)<.00001,"SINR population deviation");
-  System.out.println("9 scan ranking checks passed");
+  check(RadioBridge.sinrValue(254)==-2,"unsigned 254 is negative SINR, not excellent reception");
+  check(RadioBridge.sinrValue(128)==-128,"signed byte lower boundary");check(RadioBridge.sinrValue(127)==127,"positive signed boundary");check(RadioBridge.sinrValue(255)==-1,"unsigned minus one");check(RadioBridge.sinrValue(-2)==-2,"already signed stays signed");check(RadioBridge.sinrValue(Integer.MAX_VALUE)==null,"unavailable SINR not wrapped");check(RadioBridge.sinrValue(300)==null,"out-of-range SINR rejected");
+  System.out.println("16 scan ranking and SINR representation checks passed");
  }
 }

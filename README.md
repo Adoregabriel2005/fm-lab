@@ -46,7 +46,7 @@ Abra **Testes**, localize **Busca e comparação de emissoras** e toque em **Var
 - O ranking usa SINR médio decrescente, menor variação do SINR em caso de empate e, depois, RSSI. Toque num resultado para sintonizar.
 - Ao terminar, o app tenta restaurar a frequência solicitada antes da busca e desfaz o mudo que ele próprio ativou. O botão **Cancelar** encerra a busca; resultados incompletos são identificados como parciais.
 
-São **candidatos de recepção**, não uma identificação garantida de todas as emissoras da cidade. RDS pode não ser recebido dentro do tempo de permanência em cada canal. A posição do cabo e interferências locais mudam o ranking. A seleção inicial considera SINR bruto médio a partir de 1; esse limiar não é uma calibração universal do chip.
+São **candidatos de recepção**, não uma identificação garantida de todas as emissoras da cidade. RDS pode não ser recebido dentro do tempo de permanência em cada canal. A posição do cabo e interferências locais mudam o ranking. O SINR é interpretado como byte de 8 bits com sinal: por exemplo, 254 vira −2. Valores fora da faixa válida são descartados. A seleção inicial considera SINR médio a partir de 1; esse limiar não é uma calibração universal do chip.
 
 ## Estéreo e mono
 
@@ -98,3 +98,9 @@ Os testes cobrem FFT com tom conhecido, amplitude, DC, ausência de áudio, esta
 - `MainActivity`, `ScopeView`, `SpectrumView`, `SignalPlot`: interface e gráficos.
 
 Este repositório não define uma licença de redistribuição neste momento. A publicação do código não transfere direitos sobre componentes do sistema ou do firmware.
+
+### Representação do SINR
+
+A varredura no aparelho revelou que canais fracos podiam retornar valores de 8 bits promovidos sem sinal (por exemplo, 254). O FM Lab interpreta 128–255 como −128 a −1 **antes** de calcular médias, cores ou ordenar candidatos. RSSI permanece no formato bruto original; isso não é uma conversão calibrada de unidade.
+
+Referências da implementação alvo: [estrutura e limites no kernel Iris](https://github.com/LineageOS/android_kernel_samsung_msm8930-common/blob/cm-14.1/include/media/radio-iris.h) e [leitura do campo SINR no driver](https://github.com/LineageOS/android_kernel_samsung_msm8930-common/blob/cm-14.1/drivers/media/radio/radio-iris.c). Há testes de regressão para impedir que um canal com SINR negativo seja classificado como excelente por esse motivo.

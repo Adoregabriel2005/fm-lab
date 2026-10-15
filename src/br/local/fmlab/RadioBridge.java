@@ -40,6 +40,13 @@ final class RadioBridge {
             return value==null?"":value.trim();
         } finally {out.recycle();in.recycle();}
     }
+    static Integer sinrValue(int value){
+        // Iris station SINR is an 8-bit signed quantity; this ARM kernel can
+        // promote plain char as unsigned. Preserve already signed values.
+        if(value>=-128&&value<=127)return value;
+        if(value>=128&&value<=255)return value-256;
+        return null;
+    }
     static boolean valid(int value) {return value!=Integer.MAX_VALUE && value!=Integer.MIN_VALUE;}
     void registerEvents(IBinder callback)throws RemoteException{
         Parcel in=Parcel.obtain(),out=Parcel.obtain();try{in.writeInterfaceToken(DESCRIPTOR);in.writeStrongBinder(callback);if(!binder.transact(9,in,out,0))throw new RemoteException("Eventos indisponíveis");out.readException();}finally{out.recycle();in.recycle();}

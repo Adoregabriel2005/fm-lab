@@ -62,7 +62,7 @@ public final class MainActivity extends Activity implements RadioEvents.Listener
     private Button button(LinearLayout p,String name,boolean primary,View.OnClickListener click){Button b=new Button(this);b.setText(name);b.setAllCaps(false);b.setTextSize(13);b.setTextColor(primary?BG:TEXT);b.setBackground(shape(primary?ACCENT:0xff22334b,10));b.setMinHeight(dp(44));b.setPadding(dp(10),dp(6),dp(10),dp(6));b.setOnClickListener(click);LinearLayout.LayoutParams lp=new LinearLayout.LayoutParams(p.getOrientation()==0?0:-1,dp(46),p.getOrientation()==0?1:0);lp.setMargins(dp(3),dp(5),dp(3),dp(3));p.addView(b,lp);return b;}
     private LinearLayout row(LinearLayout p){LinearLayout r=new LinearLayout(this);r.setOrientation(0);p.addView(r);return r;}
     public void onCreate(Bundle saved){
-        super.onCreate(saved);prefs=getSharedPreferences("fmlab",0);qualitySource=prefs.getInt("qualitySource",0);qualityLow=prefs.getInt("qualityLow",5);qualityHigh=prefs.getInt("qualityHigh",15);if(qualityLow>=qualityHigh){qualityLow=5;qualityHigh=15;}
+        super.onCreate(saved);prefs=getSharedPreferences("fmlab",0);if(prefs.getInt("sinrEncoding",0)!=1)prefs.edit().remove("scanResults").putInt("sinrEncoding",1).apply();qualitySource=prefs.getInt("qualitySource",0);qualityLow=prefs.getInt("qualityLow",5);qualityHigh=prefs.getInt("qualityHigh",15);if(qualityLow>=qualityHigh){qualityLow=5;qualityHigh=15;}
         targetMs=prefs.getLong("interval",100);if(targetMs!=50&&targetMs!=100&&targetMs!=250)targetMs=100;
         getWindow().setStatusBarColor(BG);getWindow().setNavigationBarColor(BG);
         ScrollView scroll=new ScrollView(this);dashboard=scroll;scroll.setFillViewport(true);scroll.setBackgroundColor(BG);LinearLayout body=column();body.setPadding(dp(16),dp(16),dp(16),dp(24));scroll.addView(body);setContentView(scroll);
@@ -140,7 +140,7 @@ public final class MainActivity extends Activity implements RadioEvents.Listener
         if(code==RadioBridge.TUNE)receivedStereo=null;final boolean ok=r.number(code,arg)!=0;ui.post(new Runnable(){public void run(){if(destroyed)return;message(name+(ok?" · comando aceito":" · comando recusado"));if(ok){features.interrupt("sintonia / estado alterado");generation++;resetSignal();clearStation();lastMetadata=0;if(code==RadioBridge.TUNE){lastRequest=arg;set(frequencyLabel,String.format(Locale.US,"Solicitada: %.1f MHz · não confirmada pelo serviço",arg/1000.0));prefs.edit().putString("frequency",frequency.getText().toString()).apply();}else if(code==RadioBridge.OFF){knownOn=false;stopScope();}}}});
         }catch(final Exception e){ui.post(new Runnable(){public void run(){if(!destroyed){record(Log.getStackTraceString(e));message(name+": "+e.getClass().getSimpleName()+" · "+e.getMessage());}}});}}});}
     private static String shown(Integer n){return n==null?"—":n.toString();}
-    private Integer read(RadioBridge r,int code){try{int v=r.number(code,null);return RadioBridge.valid(v)?v:null;}catch(Exception e){return null;}}
+    private Integer read(RadioBridge r,int code){try{int v=r.number(code,null);return code==RadioBridge.SINR?RadioBridge.sinrValue(v):RadioBridge.valid(v)?v:null;}catch(Exception e){return null;}}
     private String readText(RadioBridge r,int code){try{return r.text(code);}catch(Exception e){return "";}}
     private String bool(Integer v,String yes,String no){return v==null?"—":v!=0?yes:no;}
     private String hex(Integer v){return v==null||v==0?"—":String.format(Locale.US,"0x%04X",v);}
