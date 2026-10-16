@@ -16,6 +16,16 @@ We are working toward stock-ROM and multi-device support by reusing accessible n
 
 See the [device support matrix, requirements, and implementation roadmap](docs/DEVICE_SUPPORT.md). To help with a port, [open a Device support issue](https://github.com/Adoregabriel2005/fm-lab/issues/new/choose) with the reviewed compatibility report and whether the native radio works.
 
+## Help bring FM Lab to more devices
+
+**Own a phone with working native FM? You can help, even without coding.** We need device/ROM reports, testing on older and newer Android versions, and verified native radio interfaces to develop additional adapters.
+
+- [Read the contribution guide](CONTRIBUTING.md) for device reports, testing, protocol research, code, and documentation.
+- [Submit a Device support report](https://github.com/Adoregabriel2005/fm-lab/issues/new?template=device-support.md) with your exact model, Android/ROM, native radio version, and observed behavior.
+- [Check the support matrix and porting roadmap](docs/DEVICE_SUPPORT.md) to see what is implemented and what is still needed.
+
+Please keep the factory radio installed. Hardware FM support alone does not guarantee that another app can access it. Each model/ROM and capability must be validated separately.
+
 ## Features
 
 - Requested tuning range of **76–108 MHz**, including extended FM, subject to native service and hardware limits.
