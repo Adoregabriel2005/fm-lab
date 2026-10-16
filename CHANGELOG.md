@@ -1,5 +1,14 @@
 # Changelog
 
+## 0.8
+
+- Separate the CAF Binder transport into `CafRadioBackend` behind an abstract internal contract.
+- Add conservative profile selection and eight regression checks against mismatched/unknown protocols (105 total checks).
+- Add read-only discovery of known FM packages, service metadata, compatibility report copying, and native app launch.
+- Declare Android 5.0 / API 21 minimum; guard API 23 runtime audio permission calls.
+- Add a device support matrix, porting requirements, roadmap, and GitHub issue template.
+- No new phone's tuner is claimed as supported. Physical regression testing and legacy OS testing remain pending.
+
 ## 0.7
 
 - Fixed bottom navigation for the S4 Mini display.

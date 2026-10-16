@@ -8,6 +8,14 @@ FM Lab controls the built-in tuner through the native radio service and displays
 
 [Download experimental APKs](https://github.com/Adoregabriel2005/fm-lab/releases) · [Changelog](CHANGELOG.md)
 
+## Multi-device effort (0.8)
+
+We are working toward stock-ROM and multi-device support by reusing accessible native FM implementations. Version 0.8 adds a dedicated CAF adapter, conservative adapter selection, native-radio discovery/launch, and a copyable compatibility report. Android 5.0 / API 21 is now the declared installation minimum; legacy-device runtime validation is still pending. The only physically verified tuner target remains the S4 Mini configuration above.
+
+**This is not universal FM support.** Motorola, MediaTek, Samsung stock, Sony, Xiaomi, and Huawei packages are discovery candidates, not working tuner adapters. Private or privileged native interfaces may prevent integration from an ordinary APK.
+
+See the [device support matrix, requirements, and implementation roadmap](docs/DEVICE_SUPPORT.md). To help with a port, [open a Device support issue](https://github.com/Adoregabriel2005/fm-lab/issues/new/choose) with the reviewed compatibility report and whether the native radio works.
+
 ## Features
 
 - Requested tuning range of **76–108 MHz**, including extended FM, subject to native service and hardware limits.
@@ -104,13 +112,13 @@ Audio, RDS, stereo events, extended tuning, and RF metrics are separate capabili
 
 ## Build on Windows
 
-Toolchain used: JDK 25.0.3, Android SDK Platform 34, Build Tools 36.0.0. Java targets Java 8 and DEX targets API 25. No Gradle or external library dependencies are required.
+Toolchain used: JDK 25.0.3, Android SDK Platform 34, Build Tools 36.0.0. Java targets Java 8 and DEX targets API 21. No Gradle or external library dependencies are required.
 
 ```powershell
 .\build.ps1 -Sdk 'C:\Android\Sdk' -Java 'C:\Program Files\Android\Android Studio\jbr'
 ```
 
-Output: `dist/FM-Lab-0.7-teste.apk`. Intermediate files and the local development key go in Git-ignored `.build/`. A fresh clone generates its own test key; it cannot update APKs signed with the distributed build's key. To use an existing local test key, pass `-KeyStore 'C:\path\test-key.p12'` with the test signing configuration expected by the script. Never publish private keys.
+Output: `dist/FM-Lab-0.8-teste.apk`. Intermediate files and the local development key go in Git-ignored `.build/`. A fresh clone generates its own test key; it cannot update APKs signed with the distributed build's key. To use an existing local test key, pass `-KeyStore 'C:\path\test-key.p12'` with the test signing configuration expected by the script. Never publish private keys.
 
 ## Tests and validation
 
@@ -118,15 +126,18 @@ Output: `dist/FM-Lab-0.7-teste.apk`. Intermediate files and the local developmen
 .\test.ps1 -Sdk 'C:\Android\Sdk' -Java 'C:\Program Files\Android\Android Studio\jbr'
 ```
 
-The 97 automated checks cover known-tone FFT, amplitude, DC, silence, missing samples, measurement statistics, CSV formatting, signal thresholds, polling policy, scan ranking, signed SINR, and band limits/alignment. JVM tests do not replace physical tuner testing or UI validation.
+The original 97 automated checks cover known-tone FFT, amplitude, DC, silence, missing samples, measurement statistics, CSV formatting, signal thresholds, polling policy, scan ranking, signed SINR, and band limits/alignment. JVM tests do not replace physical tuner testing or UI validation.
 
 - **0.5:** 83 automated checks and a real GT-I9195 scan. Refinement returned RDS names and stereo/mono events. Testing exposed and corrected unsigned-promoted SINR. Local station measurements are not distributed in the repository.
 - **0.6:** 97 checks. The target accepted 76.1 MHz and a driver event confirmed `Tuned Frequency: 76100`; useful station reception was not confirmed at that frequency. Previous tuning was restored. This was not a complete extended-band survey.
 - **0.7:** APK built, signature verified, and the same 97 checks passed. The new layout and controls still require physical-device validation; there are no new automated UI tests.
 
+Version 0.8 adds eight backend selection checks (105 total). Its adapter refactor, discovery UI, and API 21/22 runtime behavior still require physical-device validation.
+
 ## Architecture
 
-- `RadioBridge`: Binder client for the analyzed native service.
+- `RadioBridge` / `CafRadioBackend`: internal operation contract and analyzed CAF Binder adapter.
+- `BackendRegistry` / `DeviceSupport`: conservative profile selection, native radio discovery, and compatibility reports.
 - `RadioEvents`: receiver event observer.
 - `BandScanner`: sequential scanning and candidate ranking.
 - `BandPlan`: tuning limits and scan channel alignment.

@@ -15,7 +15,7 @@ $tools = Join-Path $Sdk "build-tools\$BuildTools"
 $android = Join-Path $Sdk "platforms\$Platform\android.jar"
 $dist = Join-Path $PSScriptRoot 'dist'
 New-Item -ItemType Directory -Force -Path $dist | Out-Null
-$out = Join-Path $dist 'FM-Lab-0.7-teste.apk'
+$out = Join-Path $dist 'FM-Lab-0.8-teste.apk'
 New-Item -ItemType Directory -Force -Path "$build\classes","$build\dex" | Out-Null
 $env:TEMP = $build
 $env:TMP = $build
@@ -26,7 +26,7 @@ $sources = @(Get-ChildItem -LiteralPath (Join-Path $PSScriptRoot 'src') -Recurse
 Assert-Step
 & "$Java\bin\jar.exe" cf "$build\classes.jar" -C "$build\classes" .
 Assert-Step
-& "$tools\d8.bat" --min-api 25 --lib $android --output "$build\dex" "$build\classes.jar"
+& "$tools\d8.bat" --min-api 21 --lib $android --output "$build\dex" "$build\classes.jar"
 Assert-Step
 & "$tools\aapt.exe" package -f -M "$PSScriptRoot\AndroidManifest.xml" -S "$PSScriptRoot\res" -I $android -F "$build\unsigned.apk"
 Assert-Step
