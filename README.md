@@ -1,135 +1,139 @@
 # FM Lab
 
-Rádio FM e laboratório de recepção para **Galaxy S4 Mini GT-I9195 com LineageOS 14.1 / Android 7.1.2**, sem root.
+An experimental **hardware FM radio companion and reception analyzer** for the **Samsung Galaxy S4 Mini GT-I9195 running LineageOS 14.1 / Android 7.1.2**, without root.
 
-O FM Lab usa o serviço do rádio nativo para controlar o sintonizador e consultar as métricas expostas pelo firmware. É um projeto experimental específico desse aparelho e dessa ROM; não é um receptor de rádio por internet.
+FM Lab controls the built-in tuner through the native radio service and displays the reception data exposed by the firmware. It receives over-the-air FM; it does not stream stations over the internet.
 
-## Novidades da versão 0.7
+**Compatibility is currently verified only on the device and ROM above. The APK interface is currently in Brazilian Portuguese.** Having an FM chip does not automatically make another phone compatible.
 
-Navegação fixa na parte inferior, modo compacto nos ajustes, mudo, últimas 12 sintonias e histórico de 30 mudanças do texto RDS por sessão. O botão Compartilhar abre o seletor do Android com a recepção atual; as métricas são omitidas quando estão atrasadas. A frequência compartilhada é a solicitada, pois o serviço não confirma a frequência atual.
+[Download experimental APKs](https://github.com/Adoregabriel2005/fm-lab/releases) · [Changelog](CHANGELOG.md)
 
-O modo compacto oculta os controles de conexão e o gráfico de RF para facilitar o uso na tela pequena; a aquisição continua na velocidade escolhida. Desative nos ajustes para recuperar o painel completo. Histórico de sintonia registra comandos aceitos, não confirmações do chip. O histórico RDS é temporário e pode ser limpo.
+## Features
 
-## Recursos
+- Requested tuning range of **76–108 MHz**, including extended FM, subject to native service and hardware limits.
+- Raw RSSI and SINR readings, reception history, and adjustable signal quality colors.
+- Target polling rates of 4, 10, or 20 Hz; signal graph targeting 30 FPS. Actual rates depend on the device.
+- RDS station name, RadioText, PI, PTY, and ECC when available.
+- **Stereo/mono reception status from actual receiver events**, plus automatic stereo and forced mono controls.
+- Quick and full band scans, candidate refinement, and ranking by average SINR, stability, and RSSI.
+- Oscilloscope using **audio captured directly from the FM source**, with no microphone fallback.
+- Mono audio spectrum, RMS, peak level, low audio detection, and digital peak warnings.
+- Named 10-second reception measurements to compare rooms and antenna positions.
+- Favorites, continuous metric logging, and CSV export through Android's file picker.
+- Fixed bottom navigation, persistent compact mode, mute, and the last 12 requested frequencies.
+- Timestamped history of the last 30 RadioText changes during the session, and reception report sharing.
 
-- Sintonia ampla de 76,0 a 108,0 MHz, incluindo FM estendido e favoritos com nomes.
-- RSSI e SINR brutos, histórico temporal e indicador de qualidade ajustável.
-- Leituras com alvo de 4, 10 ou 20 Hz; gráfico com alvo de 30 FPS.
-- RDS: nome, texto, PI, PTY e ECC quando recebidos.
-- Indicador de **recepção estéreo ou mono**, baseado em eventos reais do chip; estado desconhecido quando não há evento.
-- Seleção de estéreo automático ou mono forçado para experimentar a recepção com ruído.
-- **Varredura da faixa FM**: busca em passos de 0,2 ou 0,1 MHz, refinamento de até 12 candidatos e ranking por SINR médio, estabilidade e RSSI como desempate.
-- Osciloscópio do áudio **direto da fonte FM**, sem usar o microfone.
-- Espectro mono do áudio com FFT, RMS, pico e indicadores de áudio baixo/picos no limite digital.
-- Medições nomeadas de 10 segundos para comparar cômodos e posições da antena.
-- Registro contínuo de métricas e exportação de dados em CSV pelo seletor do Android.
+<img src="docs/images/audio.png" width="320" alt="Oscilloscope and audio spectrum displaying real FM audio on the Galaxy S4 Mini">
 
-<img src="docs/images/audio.png" width="320" alt="Osciloscópio e espectro funcionando com áudio real da fonte FM no S4 Mini">
+*Screenshot from version 0.4, showing the direct FM audio analysis. It does not depict the updated 0.7 navigation.*
 
-*A captura ilustra a análise de áudio introduzida na versão 0.4, mantida na 0.5.*
+## Installation and first use
 
-## Instalação
+1. Download the APK from [Releases](https://github.com/Adoregabriel2005/fm-lab/releases). These are experimental builds.
+2. Keep the native `com.caf.fmradio` app installed. The current integration checks for versionCode `25`, versionName `7.1.2`.
+3. Connect wired headphones, which serve as the phone's FM antenna.
+4. Turn on FM in the native radio app, then open FM Lab. The native app can remain in the background.
+5. Tune from FM Lab so measurements can be associated with the requested frequency.
+6. For audio analysis, tap **Ativar captura de áudio FM** and grant the audio permission requested by Android.
 
-Baixe o APK na seção **Releases** deste repositório e instale no aparelho. Builds distribuídas aqui são experimentais.
+FM Lab uses its own package, `br.local.fmlab`, and does not replace the native app. Both share the same tuner: changing frequency or turning FM off affects both apps.
 
-1. Mantenha o rádio nativo `com.caf.fmradio` instalado.
-2. Conecte o fone com fio, usado como antena pelo telefone.
-3. Ligue o FM pelo aplicativo nativo e abra o FM Lab. O nativo pode ficar em segundo plano.
-4. Sintonize pelo FM Lab para identificar a frequência solicitada nos registros.
-5. Para o osciloscópio e o espectro, ative a captura FM e permita o acesso a áudio solicitado pelo Android.
+## Finding the strongest received stations
 
-O app tem identificador próprio (`br.local.fmlab`) e não substitui o rádio nativo. Os dois compartilham o sintonizador: mudar a frequência ou desligar o FM afeta ambos.
+Open **Testes** (Tests), find **Busca e comparação de emissoras**, and tap **Varrer FM** (Scan FM).
 
-## Encontrar os melhores sinais
+- Choose wideband **76–108 MHz**, conventional **87.5–108 MHz**, or extended FM only **76.1–87.3 MHz**.
+- **Rápida** (Quick): 0.2 MHz steps aligned to odd decimal channels; 76.1–107.9 MHz for the wide band.
+- **Completa** (Full): 0.1 MHz steps including the selected band's endpoints; 76.0–108.0 MHz for the wide band.
+- Keep the phone and headphone cable still. The screen stays on during scanning.
+- Scanning temporarily mutes audio and enables automatic stereo. It takes three initial samples per frequency, then revisits up to 12 candidates with more settling time and eight samples each.
+- Results are ranked by descending average SINR, then lower SINR variation, then higher RSSI. Tap a result to request tuning.
+- On completion, the app attempts to restore the frequency requested before scanning and undo the mute it applied. **Cancelar** stops the scan; incomplete results are labeled as partial.
 
-Abra **Testes**, localize **Busca e comparação de emissoras** e toque em **Varrer FM**.
+These are reception candidates, not a guaranteed list of every local broadcaster. RDS may not arrive during a channel's dwell time. Antenna position and interference affect the ranking. Initial candidate selection uses average SINR of at least 1; this is not a universal calibration.
 
-- Escolha a faixa: ampla **76–108 MHz**, convencional **87,5–108 MHz** ou somente eFM **76,1–87,3 MHz**.
-- **Rápida:** passo de 0,2 MHz, alinhado aos canais terminados em decimal ímpar (faixa ampla: 76,1–107,9 MHz).
-- **Completa:** passo de 0,1 MHz, incluindo os limites da faixa selecionada (faixa ampla: 76,0–108,0 MHz).
-- A escolha da faixa solicita sintonia ao serviço; ela não altera nem desbloqueia o firmware. Frequências recusadas pelo serviço não são tratadas como sinais recebidos.
-- Mantenha o aparelho e o cabo do fone parados. A tela permanece ligada durante a busca.
-- O áudio é temporariamente silenciado e o estéreo automático é habilitado.
-- A busca inicial mede três amostras por frequência; os até 12 candidatos com melhor resultado são revisitados, com mais tempo de estabilização e oito amostras cada.
-- O ranking usa SINR médio decrescente, menor variação do SINR em caso de empate e, depois, RSSI. Toque num resultado para sintonizar.
-- Ao terminar, o app tenta restaurar a frequência solicitada antes da busca e desfaz o mudo que ele próprio ativou. O botão **Cancelar** encerra a busca; resultados incompletos são identificados como parciais.
+Band selection requests frequencies from the native service. It does not reconfigure or unlock the firmware, and rejected tuning commands are not counted as received stations.
 
-São **candidatos de recepção**, não uma identificação garantida de todas as emissoras da cidade. RDS pode não ser recebido dentro do tempo de permanência em cada canal. A posição do cabo e interferências locais mudam o ranking. O SINR é interpretado como byte de 8 bits com sinal: por exemplo, 254 vira −2. Valores fora da faixa válida são descartados. A seleção inicial considera SINR médio a partir de 1; esse limiar não é uma calibração universal do chip.
+## Everyday controls
 
-## Estéreo e mono
+The fixed bottom navigation links to **Rádio** (Radio), **Áudio** (Audio), **Testes** (Tests), and **Dados** (Data).
 
-O indicador usa `onAudioUpdate` do serviço nativo. Um comando aceito para permitir estéreo não prova que o receptor conseguiu decodificá-lo. **Mono recebido** também não prova que a emissora transmita somente em mono: sinal fraco, interferência ou configuração podem impedir o estéreo.
+- **Modo compacto** in the panel settings hides connection controls and the RF graph for the small display. Acquisition continues at the selected rate; turn compact mode off to restore the full panel.
+- **Mudo / Ouvir** toggles mute using the native service state.
+- **Recentes** lists up to 12 distinct requested frequencies whose tuning commands were accepted. These entries persist across sessions; acceptance is not confirmation of the chip's current frequency.
+- **Texto RDS** shows up to 30 RadioText changes with timestamps. This history is temporary and can be cleared.
+- **Compartilhar** opens Android's share chooser with station information and recent reception metrics. Stale metrics are omitted. Frequency is explicitly labeled as requested.
 
-O protocolo original tem apenas um slot de callbacks. O FM Lab registra seu observador quando está em primeiro plano; o aplicativo nativo volta a registrar o dele ao ser aberto. O FM Lab não tenta apagar o observador do outro aplicativo ao sair. O observador usa referência fraca à Activity para não mantê-la viva desnecessariamente. Esta integração continua específica da ROM e pode interagir com as atualizações da interface nativa.
+## Comparing reception locations
 
-O estado estéreo da **recepção RF** é separado da captura PCM mono usada pelos gráficos. O analisador não usa diferença entre canais de áudio para adivinhar se o rádio abriu estéreo.
+In **Testes → Medir local · 10 s**, name a location, wait for collection to finish, then repeat elsewhere. **Comparar locais** groups measurements by frequency and sorts by average SINR. Keep the same phone, frequency, and headphone cable arrangement to isolate the change you want to compare.
 
-## Medir cobertura
+Favorites and up to 50 measurements are stored locally. Continuous logging holds up to 12,000 readings in memory; export before closing or updating the app. Leaving the screen, turning FM off, or changing tuning interrupts collection. CSV uses semicolons and decimal points. CSV formatting is covered by tests; saving through the device's file picker has not yet been verified end to end.
 
-Em **Testes → Medir local · 10 s**, nomeie o ponto, aguarde e repita em outra posição. **Comparar locais** agrupa por frequência e ordena por SINR médio. Use o mesmo aparelho, frequência e posição do cabo do fone para comparar apenas a mudança desejada.
+## Accuracy and limitations
 
-Favoritos e até 50 medições ficam salvos localmente. O registro contínuo tem limite de 12.000 leituras e permanece em memória; exporte antes de encerrar ou atualizar o app. Sair da tela, desligar ou alterar a sintonia interrompe a coleta. CSV usa ponto e vírgula e ponto decimal.
+- RF values are **raw driver readings**, without calibrated dBm conversion. They do not estimate transmitter wattage or distance.
+- Signal colors use adjustable thresholds and do not guarantee clean audio.
+- The service does not expose a current-frequency query. The UI shows requested frequencies or accepted restoration commands.
+- Stereo status comes from the native service's `onAudioUpdate` callback. Enabling automatic stereo does not prove stereo decoding succeeded. Mono reception does not prove the station broadcasts only in mono.
+- RF stereo status is separate from the mono PCM used for audio analysis; it is not inferred from audio channel differences.
+- Audio uses vendor source ID `1998`, verified on the target device. There is no microphone or general output-mix fallback.
+- Audio analysis uses 44.1 kHz capture, a 1,024-point Hann-window FFT, and DC removal. The spectrum represents **audio**, not the RF carrier. RMS and dBFS are digital levels, not volts or field strength.
+- The receiver must still be initialized from the native UI to avoid an observed Looper failure when powering on through a remote Binder call.
+- The native protocol has only one callback slot. FM Lab registers while foregrounded; the native app registers again when opened. FM Lab does not clear the other app's observer on exit. Its observer holds a weak Activity reference. This ROM-specific integration can affect native UI updates.
+- The original APK, vendor libraries, firmware, decompiled vendor sources, and private signing keys are not distributed here.
 
-## Precisão e limites
+### Signed SINR interpretation
 
-- Valores RF são **brutos do driver**, sem conversão calibrada para dBm. Não são estimativas de watts, potência do transmissor ou distância.
-- Cores do sinal são estimativas com limites ajustáveis, não garantia de áudio limpo.
-- O serviço não oferece consulta da frequência atual: a interface identifica a frequência como **solicitada** ou comando de restauração aceito.
-- A fonte de áudio FM é a identificação de fabricante `1998`, validada no alvo. Não há fallback para microfone nem para a mistura geral de áudio.
-- FFT de 1.024 pontos com janela Hann e remoção de DC, captura a 44,1 kHz. O gráfico é do **áudio**, não do espectro de RF. RMS e dBFS são níveis digitais, não volts ou intensidade do campo.
-- O app ainda depende da inicialização do receptor pela interface nativa, evitando uma falha de Looper observada no comando remoto de ligar.
-- O APK original, bibliotecas do fabricante, firmware, fontes descompilados e chaves de assinatura não são distribuídos neste repositório.
+Device testing found weak channels returning unsigned-promoted 8-bit values, such as `254`. FM Lab maps `128–255` to `−128…−1` **before** averaging, coloring, or ranking. Already-signed values are preserved; values outside the supported range are discarded. RSSI remains raw. This is representation correction, not unit calibration.
 
-## Compilar no Windows
+Target implementation references: [Iris structures and limits](https://github.com/LineageOS/android_kernel_samsung_msm8930-common/blob/cm-14.1/include/media/radio-iris.h) and [driver SINR handling](https://github.com/LineageOS/android_kernel_samsung_msm8930-common/blob/cm-14.1/drivers/media/radio/radio-iris.c). Regression tests cover negative SINR ranking.
 
-Requisitos utilizados: JDK 25.0.3, Android SDK Platform 34 e Build Tools 36.0.0. O Java é compilado para Java 8 e o DEX tem API mínima 25. Não há Gradle ou dependências externas de bibliotecas.
+## Extended FM and device compatibility
+
+The app accepts tuning requests from 76.0 to 108.0 MHz. Actual acceptance depends on hardware and the native radio configuration. If frequencies below 87.5 MHz are rejected, check the native app's region/band options. Selecting a Japanese region may also lower the upper limit, so it does not necessarily enable the full 76–108 MHz range. FM Lab does not modify the system app's private preferences or unlock driver bands.
+
+| Device / environment | Status |
+| --- | --- |
+| GT-I9195, LineageOS 14.1, Android 7.1.2, analyzed CAF service | Tested target |
+| Another device with the same CAF service, protocol, and permissions | Possible candidate; unverified |
+| Different service, chipset, or firmware | Requires a compatible backend and device testing |
+| No FM tuner accessible to Android | The app cannot provide that hardware |
+
+Audio, RDS, stereo events, extended tuning, and RF metrics are separate capabilities. For compatibility reports, include the exact model, ROM, Android version, native radio package/version, and observed error. There is no claim of universal Android or Motorola support.
+
+## Build on Windows
+
+Toolchain used: JDK 25.0.3, Android SDK Platform 34, Build Tools 36.0.0. Java targets Java 8 and DEX targets API 25. No Gradle or external library dependencies are required.
 
 ```powershell
 .\build.ps1 -Sdk 'C:\Android\Sdk' -Java 'C:\Program Files\Android\Android Studio\jbr'
 ```
 
-Saída: `dist/FM-Lab-0.6-teste.apk`. Intermediários e chave local de desenvolvimento ficam em `.build/`, ignorados pelo Git. Um clone gera sua própria chave de testes; essa chave não substitui a assinatura dos APKs distribuídos. Para uma assinatura local existente, informe `-KeyStore 'C:\caminho\test-key.p12'` com a configuração de testes esperada pelo script. Não publique chaves privadas.
+Output: `dist/FM-Lab-0.7-teste.apk`. Intermediate files and the local development key go in Git-ignored `.build/`. A fresh clone generates its own test key; it cannot update APKs signed with the distributed build's key. To use an existing local test key, pass `-KeyStore 'C:\path\test-key.p12'` with the test signing configuration expected by the script. Never publish private keys.
 
-## Testes e arquitetura
+## Tests and validation
 
 ```powershell
 .\test.ps1 -Sdk 'C:\Android\Sdk' -Java 'C:\Program Files\Android\Android Studio\jbr'
 ```
 
-Os testes cobrem FFT com tom conhecido, amplitude, DC, ausência de áudio, estatísticas com amostras ausentes, CSV, limites de qualidade, taxa e ordenação da busca. Testes em JVM não substituem validação do sintonizador real.
+The 97 automated checks cover known-tone FFT, amplitude, DC, silence, missing samples, measurement statistics, CSV formatting, signal thresholds, polling policy, scan ranking, signed SINR, and band limits/alignment. JVM tests do not replace physical tuner testing or UI validation.
 
-- `RadioBridge`: cliente Binder do serviço nativo, com chamadas limitadas às operações utilizadas.
-- `RadioEvents`: observador de eventos do receptor.
-- `BandScanner`: varredura sequencial e ranking de candidatos.
-- `AudioScope` / `AudioAnalysis`: captura exclusiva da fonte FM e análise do PCM.
-- `LabFeatures` / `Measurement`: favoritos, coletas nomeadas, registro e CSV.
-- `MainActivity`, `ScopeView`, `SpectrumView`, `SignalPlot`: interface e gráficos.
+- **0.5:** 83 automated checks and a real GT-I9195 scan. Refinement returned RDS names and stereo/mono events. Testing exposed and corrected unsigned-promoted SINR. Local station measurements are not distributed in the repository.
+- **0.6:** 97 checks. The target accepted 76.1 MHz and a driver event confirmed `Tuned Frequency: 76100`; useful station reception was not confirmed at that frequency. Previous tuning was restored. This was not a complete extended-band survey.
+- **0.7:** APK built, signature verified, and the same 97 checks passed. The new layout and controls still require physical-device validation; there are no new automated UI tests.
 
-Este repositório não define uma licença de redistribuição neste momento. A publicação do código não transfere direitos sobre componentes do sistema ou do firmware.
+## Architecture
 
-### Representação do SINR
+- `RadioBridge`: Binder client for the analyzed native service.
+- `RadioEvents`: receiver event observer.
+- `BandScanner`: sequential scanning and candidate ranking.
+- `BandPlan`: tuning limits and scan channel alignment.
+- `AudioScope` / `AudioAnalysis`: direct FM capture and PCM analysis.
+- `LabFeatures` / `Measurement`: favorites, named measurements, logging, and CSV.
+- `MainActivity`, `ScopeView`, `SpectrumView`, `SignalPlot`: interface and graphs.
 
-A varredura no aparelho revelou que canais fracos podiam retornar valores de 8 bits promovidos sem sinal (por exemplo, 254). O FM Lab interpreta 128–255 como −128 a −1 **antes** de calcular médias, cores ou ordenar candidatos. RSSI permanece no formato bruto original; isso não é uma conversão calibrada de unidade.
+## License
 
-Referências da implementação alvo: [estrutura e limites no kernel Iris](https://github.com/LineageOS/android_kernel_samsung_msm8930-common/blob/cm-14.1/include/media/radio-iris.h) e [leitura do campo SINR no driver](https://github.com/LineageOS/android_kernel_samsung_msm8930-common/blob/cm-14.1/drivers/media/radio/radio-iris.c). Há testes de regressão para impedir que um canal com SINR negativo seja classificado como excelente por esse motivo.
-
-### Validação da versão 0.5
-
-Foram executadas 83 verificações automatizadas e uma busca real no GT-I9195. O refinamento produziu candidatos com nome RDS e eventos reais de estéreo e mono. O teste também identificou e corrigiu a interpretação incorreta do SINR promovido sem sinal. Os resultados de frequência e qualidade variam por posição e não fazem parte dos dados distribuídos no repositório.
-
-## FM estendido e compatibilidade
-
-A versão 0.6 aceita sintonia de 76,0 a 108,0 MHz e permite incluir o eFM na varredura. A aceitação real depende dos limites configurados no rádio nativo e do hardware. Se frequências abaixo de 87,5 MHz forem recusadas, confira as opções de região/faixa no rádio nativo; selecionar uma região japonesa pode também reduzir o limite superior, portanto não equivale automaticamente a habilitar toda a faixa 76–108 MHz. O FM Lab não escreve preferências privadas do aplicativo do sistema nem desbloqueia faixas no driver.
-
-| Situação | Compatibilidade |
-| --- | --- |
-| GT-I9195 / LineageOS 14.1 / Android 7.1.2 / serviço original analisado | Alvo testado |
-| Outro aparelho com o mesmo serviço CAF, protocolo e permissões | Possível candidato; ainda não validado |
-| Aparelho com outro serviço, chip ou firmware | Precisa de um backend compatível e testes próprios |
-| Aparelho sem sintonizador FM disponível ao sistema | O app não cria esse hardware |
-
-Ter FM integrado não garante acesso por um app separado. A versão atual continua verificando o pacote e a versão do serviço analisado; ela não remove essas verificações para fingir compatibilidade. Áudio, RDS, estéreo, faixa estendida e métricas são capacidades separadas e podem variar entre aparelhos. Para novos alvos, informe modelo exato, ROM, versão do Android e o serviço de rádio disponível.
-
-### Validação da versão 0.6
-
-Foram executadas 97 verificações automatizadas. No GT-I9195 testado, o serviço aceitou 76,1 MHz e o evento do driver confirmou `Tuned Frequency: 76100`. Não havia recepção útil confirmada nesse ponto de teste; aceitação da frequência não significa presença de emissora. A sintonia anterior foi restaurada depois da validação. Não foi executado um levantamento completo de emissoras da faixa estendida nesta validação.
+No redistribution license has been selected yet. Public source availability does not grant rights to system or firmware components.
