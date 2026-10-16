@@ -4,6 +4,12 @@ Rádio FM e laboratório de recepção para **Galaxy S4 Mini GT-I9195 com Lineag
 
 O FM Lab usa o serviço do rádio nativo para controlar o sintonizador e consultar as métricas expostas pelo firmware. É um projeto experimental específico desse aparelho e dessa ROM; não é um receptor de rádio por internet.
 
+## Novidades da versão 0.7
+
+Navegação fixa na parte inferior, modo compacto nos ajustes, mudo, últimas 12 sintonias e histórico de 30 mudanças do texto RDS por sessão. O botão Compartilhar abre o seletor do Android com a recepção atual; as métricas são omitidas quando estão atrasadas. A frequência compartilhada é a solicitada, pois o serviço não confirma a frequência atual.
+
+O modo compacto oculta os controles de conexão e o gráfico de RF para facilitar o uso na tela pequena; a aquisição continua na velocidade escolhida. Desative nos ajustes para recuperar o painel completo. Histórico de sintonia registra comandos aceitos, não confirmações do chip. O histórico RDS é temporário e pode ser limpo.
+
 ## Recursos
 
 - Sintonia ampla de 76,0 a 108,0 MHz, incluindo FM estendido e favoritos com nomes.

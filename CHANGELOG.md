@@ -1,5 +1,15 @@
 # Histórico de versões
 
+## 0.7
+
+- Navegação fixa na parte inferior para a tela do S4 Mini.
+- Modo compacto persistente: oculta controles de conexão e gráfico de RF, mantendo sintonia e indicador de sinal.
+- Mudo com consulta ao estado real do serviço.
+- Últimas 12 sintonias solicitadas, persistentes e sem duplicação.
+- Histórico das últimas 30 mudanças de texto RDS da sessão, com horário.
+- Compartilhamento de recepção com métricas recentes e frequência explicitamente solicitada.
+- Nome do app corrigido no launcher.
+
 ## 0.6
 
 - Sintonia de 76 a 108 MHz e varreduras ampla, convencional e somente eFM.
