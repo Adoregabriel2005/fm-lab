@@ -26,6 +26,17 @@ See the [device support matrix, requirements, and implementation roadmap](docs/D
 
 Please keep the factory radio installed. Hardware FM support alone does not guarantee that another app can access it. Each model/ROM and capability must be validated separately.
 
+## Stability and cleanup (0.10)
+
+- Scanning and ordinary native radio work now share a bounded serial worker. CAF transactions are also synchronized, and queued controls are ignored if a scan started or the bridge changed.
+- Connection/scan generations and bridge identity checks reject stale completions. Leaving the screen cancels scanning with attempted restoration; explicitly opening the native radio preserves the separate no-restore policy. Restoration and unmuting remain best effort.
+- Audio frame delivery is generation-aware, so callbacks from a stopped capture cannot unlock a new session. Vendor audio stop requests are dispatched off the UI thread, empty reads are bounded, and split stereo frames preserve their trailing sample.
+- FFT buffers and the Hann window are reused per capture session; meter coefficients and temporary sums are reused. The RF animation is disabled while paused or in compact mode. No device performance benchmark is claimed.
+- CSV writes run off the UI thread. Missing pending export data is reported rather than silently written, and malformed saved favorites/measurement entries are skipped on read.
+- Java sources and tests use consistent formatting; named internal operations replace repeated mute/stereo magic numbers.
+
+**204 automated checks passed**, including 53 new lifecycle/workspace/queue checks. Physical-device regression, vendor shutdown behavior, Android file-provider export, and actual CPU/memory impact still require testing. Synchronous vendor Binder calls cannot be forcibly timed out by this implementation; a stalled vendor service remains a limitation.
+
 ## What makes FM Lab different (0.9)
 
 The aim is to help you understand and compare actual reception, beyond tuning and station presets:
@@ -140,7 +151,7 @@ Toolchain used: JDK 25.0.3, Android SDK Platform 34, Build Tools 36.0.0. Java ta
 .\build.ps1 -Sdk 'C:\Android\Sdk' -Java 'C:\Program Files\Android\Android Studio\jbr'
 ```
 
-Output: `dist/FM-Lab-0.9-teste.apk`. Intermediate files and the local development key go in Git-ignored `.build/`. A fresh clone generates its own test key; it cannot update APKs signed with the distributed build's key. To use an existing local test key, pass `-KeyStore 'C:\path\test-key.p12'` with the test signing configuration expected by the script. Never publish private keys.
+Output: `dist/FM-Lab-0.10-teste.apk`. Intermediate files and the local development key go in Git-ignored `.build/`. A fresh clone generates its own test key; it cannot update APKs signed with the distributed build's key. To use an existing local test key, pass `-KeyStore 'C:\path\test-key.p12'` with the test signing configuration expected by the script. Never publish private keys.
 
 ## Tests and validation
 

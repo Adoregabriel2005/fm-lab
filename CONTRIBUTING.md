@@ -69,6 +69,8 @@ Windows build and tests:
 .\test.ps1 -Sdk 'C:\Android\Sdk' -Java 'C:\Program Files\Android\Android Studio\jbr' -SkipBuild
 ```
 
+Java source and tests are formatted with google-java-format (1.37.0 was used for the 0.10 cleanup). The formatter is an optional development tool, not an app or build dependency.
+
 A fresh clone generates its own local test key. Its APK cannot update an installation signed with the distributed key. Prefer a spare test device or emulator for UI-only work; an emulator does not validate FM hardware. Preserve any local measurements before changing installations.
 
 Contributions to accessibility, English UI/localization, low-memory performance, documentation, and clearer error handling are also welcome. None of those requires owning every supported phone.

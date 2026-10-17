@@ -1,5 +1,16 @@
 # Changelog
 
+## 0.10
+
+- Serialize scan/control work through one bounded worker and synchronize CAF transport calls.
+- Reject stale connection, scan, and command completions; stop offscreen RF animation in compact/paused mode.
+- Preserve the first scan cancellation policy, restore on ordinary pause, and handle deadline jumps/interruption cleanup.
+- Fix audio frame ownership across capture generations, bound empty reads, preserve split stereo PCM frames, and move vendor stop requests off the UI thread.
+- Reuse FFT workspace/window and meter coefficients/scratch buffers.
+- Move CSV writes off the UI thread, reject missing pending exports, and skip malformed saved entries.
+- Standardize Java formatting and use named mute/stereo operations.
+- 53 new regression checks; 204 total pass. Physical validation and device performance measurements remain pending.
+
 ## 0.9
 
 - Guided 10-second antenna A/B comparison using mean raw SINR and variation, with freshness/coverage validation and invalidation on state changes.
