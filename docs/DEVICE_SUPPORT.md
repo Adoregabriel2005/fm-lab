@@ -20,7 +20,7 @@ Some phones may support only opening the native app from FM Lab. If there is no 
 
 | Integration | Discovery / native app launch | Tuner control | RF / RDS / stereo / PCM |
 | --- | --- | --- | --- |
-| GT-I9195 / LineageOS 14.1 / analyzed CAF profile | Implemented | Previously verified; adapter refactor awaits device regression test | Previously verified on target; current refactor awaits regression |
+| GT-I9195 / LineageOS 14.1 / analyzed CAF profile | Implemented | Verified in 1.0 candidate regression | RF/RDS/stereo/direct mono PCM exercised on target |
 | Same CAF package and exact version on another ROM/device | Candidate detection | Profile can be selected; device unverified | Must be tested separately |
 | Motorola `com.motorola.fmplayer` | Candidate discovery / launch | No adapter | Unknown; Motorola package alone is insufficient |
 | MediaTek / AOSP FM packages | Candidate discovery / launch | No adapter | Unknown |
@@ -62,7 +62,7 @@ Still needed before adding another adapter:
 
 ## Priorities
 
-1. Regression-test the adapter refactor on the known S4 Mini target.
+1. Extend regression coverage beyond the S4 Mini tests recorded in [release validation](RELEASE_VALIDATION.md).
 2. Gather reports and locate a working native app for the Moto g06; determine its actual service/library path before promising a backend.
 3. Select one additional accessible CAF or MediaTek device for a verified port.
 4. Implement the typed capability layer, then the first non-CAF adapter.
@@ -70,6 +70,6 @@ Still needed before adding another adapter:
 
 ## How to submit a report
 
-Install the experimental 0.8 APK and open **Dados → Compatibilidade / rádios do aparelho** in the panel settings. Tap **Copiar relatório**, review it, and paste it into a Device support issue. It contains model/build information and known FM package/service metadata, not serial numbers, accounts, locations, or unrelated applications.
+Install the latest FM Lab APK and open **Dados → Compatibilidade / rádios do aparelho** in the panel settings. Tap **Copiar relatório**, review it, and paste it into a Device support issue. It contains model/build information and known FM package/service metadata, not serial numbers, accounts, locations, or unrelated applications.
 
 Add whether the original radio works, the exact missing feature/error, and whether the phone uses stock firmware or a custom ROM. Do not include private device identifiers or complete logs containing personal information. Do not attach proprietary APKs. Reports are reviewed manually; no data is uploaded automatically.

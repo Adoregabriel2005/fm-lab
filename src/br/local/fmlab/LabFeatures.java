@@ -18,6 +18,8 @@ final class LabFeatures {
 
     boolean isOn();
 
+    boolean scanning();
+
     String station();
 
     int source();
@@ -184,7 +186,8 @@ final class LabFeatures {
   }
 
   private void applyAwake(boolean enabled) {
-    if (enabled) app.getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
+    if (ScreenAwakePolicy.keepAwake(enabled, host.scanning()))
+      app.getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
     else app.getWindow().clearFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
   }
 

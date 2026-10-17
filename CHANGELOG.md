@@ -1,12 +1,16 @@
 # Changelog
 
-## 1.0.0-rc1
+## 1.0.0
 
-- Derive the displayed version and diagnostics header from installed package metadata.
-- Derive the APK filename from manifest versionName to avoid release naming drift.
-- Clean up build/test script messages and add an explicit physical release-validation checklist.
-- VersionCode 11; same signing certificate as 0.10. Build/signature/packaging and 204 automated checks pass.
-- Release candidate only: physical regression, upgrade/data preservation, export, and sustained-use checks remain pending.
+- Keep navigation focus on the dashboard so the frequency keyboard does not reopen after changing sections.
+- Use the nearest resolved FFT bin for narrow low-frequency display bands; do not show artificial silence or imply finer frequency resolution.
+- Latch audio failures before cleanup to prevent automatic restart races; clear stale RMS/peak summaries and live displays when samples stop.
+- Keep the screen awake during a scan even when the test preference is unchecked.
+- Use one explicit `FM Lab` resource for application and launcher labels; validate both in the packaged APK.
+- Derive version text, diagnostics, and APK filenames from installed/manifest metadata.
+- Add real screenshots and an English illustrated guide; update compatibility and physical validation records.
+- VersionCode 14, unchanged package and signing certificate. 217 automated checks pass.
+- S4 Mini regression includes complete/cancelled scans, RDS, stereo/mono, direct PCM, permission recovery, A/B trials, antenna reconnection, upgrade preservation, and a real CSV export. See the validation report for exact candidate coverage and untested cases; other models remain unverified.
 
 ## 0.10
 

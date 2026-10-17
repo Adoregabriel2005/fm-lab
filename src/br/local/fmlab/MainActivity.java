@@ -202,6 +202,8 @@ public final class MainActivity extends Activity implements RadioEvents.Listener
     ScrollView scroll = new ScrollView(this);
     dashboard = scroll;
     scroll.setFillViewport(true);
+    scroll.setFocusableInTouchMode(true);
+    scroll.setDescendantFocusability(ViewGroup.FOCUS_BEFORE_DESCENDANTS);
     scroll.setBackgroundColor(BG);
     LinearLayout body = column();
     body.setPadding(dp(16), dp(16), dp(16), dp(24));
@@ -227,7 +229,7 @@ public final class MainActivity extends Activity implements RadioEvents.Listener
         false,
         new View.OnClickListener() {
           public void onClick(View v) {
-            dashboard.smoothScrollTo(0, 0);
+            jump(null);
           }
         });
     button(
@@ -406,6 +408,10 @@ public final class MainActivity extends Activity implements RadioEvents.Listener
             new LabFeatures.Host() {
               public int frequency() {
                 return lastRequest;
+              }
+
+              public boolean scanning() {
+                return scanner.isRunning();
               }
 
               public boolean isOn() {
@@ -728,6 +734,9 @@ public final class MainActivity extends Activity implements RadioEvents.Listener
 
   private void clearAudioHistory() {
     if (levelMeters != null) levelMeters.clear();
+    if (scopeStats != null) set(scopeStats, "Aguardando amostras reais do áudio FM");
+    silentSince = 0;
+    clipUntil = 0;
     frozenAudio = false;
     if (scopeView != null) scopeView.freeze(false);
     if (spectrum != null) spectrum.freeze(false);
@@ -987,7 +996,11 @@ public final class MainActivity extends Activity implements RadioEvents.Listener
   }
 
   private void jump(View v) {
-    if (v != null) dashboard.smoothScrollTo(0, Math.max(0, v.getTop() - dp(8)));
+    dashboard.requestFocus();
+    android.view.inputmethod.InputMethodManager input =
+        (android.view.inputmethod.InputMethodManager) getSystemService(INPUT_METHOD_SERVICE);
+    if (input != null) input.hideSoftInputFromWindow(dashboard.getWindowToken(), 0);
+    dashboard.smoothScrollTo(0, v == null ? 0 : Math.max(0, v.getTop() - dp(8)));
   }
 
   private final ServiceConnection connection =
@@ -1374,7 +1387,9 @@ public final class MainActivity extends Activity implements RadioEvents.Listener
                           invalidateComparison();
                           stopScope();
                           plot.clear();
-                        } else if (wantScope && !scope.isRunning()) scope.start();
+                        } else if (wantScope
+                            && !scope.isRunning()
+                            && scope.canRestartAutomatically()) scope.start();
                         if (ended - lastLog >= 1000) {
                           lastLog = ended;
                           record(
@@ -1923,7 +1938,12 @@ public final class MainActivity extends Activity implements RadioEvents.Listener
             long now = SystemClock.elapsedRealtime();
             if (audioAnalysis == null || now - audioTimestamp > 800) {
               set(audioAlert, "Aguardando amostras recentes do áudio FM");
-              if (!frozenAudio) spectrum.clear();
+              levelMeters.clear();
+              if (!frozenAudio) {
+                scopeView.clear();
+                spectrum.clear();
+                set(scopeStats, "Aguardando amostras recentes do áudio FM");
+              }
             } else if (now < clipUntil) {
               set(audioAlert, "Picos próximos do limite digital · possível saturação");
               audioAlert.setTextColor(0xffff6b7a);

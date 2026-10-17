@@ -1,12 +1,12 @@
 # FM Lab
 
-An experimental **hardware FM radio companion and reception analyzer** for the **Samsung Galaxy S4 Mini GT-I9195 running LineageOS 14.1 / Android 7.1.2**, without root.
+A **hardware FM radio companion and reception analyzer** for the **Samsung Galaxy S4 Mini GT-I9195 running LineageOS 14.1 / Android 7.1.2**, without root.
 
 FM Lab controls the built-in tuner through the native radio service and displays the reception data exposed by the firmware. It receives over-the-air FM; it does not stream stations over the internet.
 
 **Compatibility is currently verified only on the device and ROM above. The APK interface is currently in Brazilian Portuguese.** Having an FM chip does not automatically make another phone compatible.
 
-[Download experimental APKs](https://github.com/Adoregabriel2005/fm-lab/releases) · [Changelog](CHANGELOG.md)
+[Download APKs](https://github.com/Adoregabriel2005/fm-lab/releases) · [Changelog](CHANGELOG.md)
 
 ## Multi-device effort (0.8)
 
@@ -26,11 +26,11 @@ See the [device support matrix, requirements, and implementation roadmap](docs/D
 
 Please keep the factory radio installed. Hardware FM support alone does not guarantee that another app can access it. Each model/ROM and capability must be validated separately.
 
-## 1.0 release candidate
+## 1.0 release
 
-**1.0.0-rc1 is a release candidate, not a stable certification.** It keeps the 0.10 stability work and makes version labels, diagnostics, and APK filenames derive from package/manifest metadata. Its signature matches 0.10, so an in-place upgrade is eligible; actual data preservation still needs a device test.
+Version **1.0.0** focuses on the supported S4 Mini / LineageOS 14.1 configuration. It fixes navigation focus, low-frequency FFT display, audio failure/restart handling, scan wake-lock policy, and stale audio summaries. The launcher and application share the explicit **FM Lab** resource; packaging now rejects a wrong label. Version labels and APK filenames come from package metadata.
 
-Build, signature, packaging checks, and all 204 automated checks pass. Physical S4 Mini regression and sustained-use testing are still pending. See the [release validation checklist](docs/RELEASE_VALIDATION.md). The candidate does not expand verified tuner compatibility.
+**217 automated checks pass.** Physical tests exercised native FM, RDS, stereo/mono, direct PCM analysis, scanning/restoration, A/B trials, permission denial/re-grant, antenna reconnection, and real CSV saving. An in-place upgrade from the phone's 0.6 installation preserved existing favorites, measurements, and settings. See [validation results and remaining coverage](docs/RELEASE_VALIDATION.md). This release does not expand verified device compatibility.
 
 ## Stability and cleanup (0.10)
 
@@ -41,7 +41,7 @@ Build, signature, packaging checks, and all 204 automated checks pass. Physical 
 - CSV writes run off the UI thread. Missing pending export data is reported rather than silently written, and malformed saved favorites/measurement entries are skipped on read.
 - Java sources and tests use consistent formatting; named internal operations replace repeated mute/stereo magic numbers.
 
-**204 automated checks passed**, including 53 new lifecycle/workspace/queue checks. Physical-device regression, vendor shutdown behavior, Android file-provider export, and actual CPU/memory impact still require testing. Synchronous vendor Binder calls cannot be forcibly timed out by this implementation; a stalled vendor service remains a limitation.
+**204 automated checks passed in 0.10**, including 53 new lifecycle/workspace/queue checks. The 1.0 physical regression and file-provider export results are recorded in the validation report; no controlled CPU/memory benchmark is claimed. Synchronous vendor Binder calls cannot be forcibly timed out by this implementation; a stalled vendor service remains a limitation.
 
 ## What makes FM Lab different (0.9)
 
@@ -53,7 +53,7 @@ The aim is to help you understand and compare actual reception, beyond tuning an
 - **Continuous digital level meters:** process every PCM block delivered by AudioRecord, independently of drawing/FFT frame delivery. RMS uses a 300 ms exponential mean-square response; sample peaks have a 1-second hold followed by 20 dB/s decay. Exact full-scale PCM samples are counted for the capture session.
 - **More faithful oscilloscope rendering:** rising zero trigger with arming hysteresis, per-pixel extrema for dense waveforms, and window RMS/peak calculated from the displayed sample range.
 
-These changes are experimental; the new UI, drawing performance, and end-to-end audio measurements still need physical-device validation.
+These features have now been exercised on the supported S4 Mini. Synthetic audio checks validate the digital algorithms; this is not calibration of the analog tuner or an external measuring instrument.
 
 ## Features
 
@@ -70,13 +70,21 @@ These changes are experimental; the new UI, drawing performance, and end-to-end 
 - Fixed bottom navigation, persistent compact mode, mute, and the last 12 requested frequencies.
 - Timestamped history of the last 30 RadioText changes during the session, and reception report sharing.
 
-<img src="docs/images/audio.png" width="320" alt="Oscilloscope and audio spectrum displaying real FM audio on the Galaxy S4 Mini">
+## Screenshots and walkthrough
 
-*Screenshot from version 0.4, showing the direct FM audio analysis. It does not depict the updated 0.7 navigation.*
+Real captures from the S4 Mini; the app interface is in Brazilian Portuguese. [Open the illustrated guide](docs/SCREENSHOTS.md) for controls, examples, and measurement limitations.
+
+| Native FM and RDS | Direct PCM oscilloscope and meters |
+| --- | --- |
+| <img src="docs/images/radio.png" width="270" alt="Native FM connection, RDS and stereo status"> | <img src="docs/images/audio-levels.png" width="270" alt="Real FM waveform and digital RMS and peak levels"> |
+
+| Audio spectrum and history | Receiver data and settings |
+| --- | --- |
+| <img src="docs/images/spectrum.png" width="270" alt="Audio FFT spectrum and eight-second spectrogram"> | <img src="docs/images/receiver-settings.png" width="270" alt="RDS fields, antenna state and panel settings"> |
 
 ## Installation and first use
 
-1. Download the APK from [Releases](https://github.com/Adoregabriel2005/fm-lab/releases). These are experimental builds.
+1. Download the APK from [Releases](https://github.com/Adoregabriel2005/fm-lab/releases). Check the release notes and supported configuration before installing.
 2. Keep the native `com.caf.fmradio` app installed. The current integration checks for versionCode `25`, versionName `7.1.2`.
 3. Connect wired headphones, which serve as the phone's FM antenna.
 4. Turn on FM in the native radio app, then open FM Lab. The native app can remain in the background.
@@ -157,7 +165,7 @@ Toolchain used: JDK 25.0.3, Android SDK Platform 34, Build Tools 36.0.0. Java ta
 .\build.ps1 -Sdk 'C:\Android\Sdk' -Java 'C:\Program Files\Android\Android Studio\jbr'
 ```
 
-Output: `dist/FM-Lab-1.0.0-rc1.apk`. Intermediate files and the local development key go in Git-ignored `.build/`. A fresh clone generates its own test key; it cannot update APKs signed with the distributed build's key. To use an existing local test key, pass `-KeyStore 'C:\path\test-key.p12'` with the test signing configuration expected by the script. Never publish private keys.
+Output: `dist/FM-Lab-1.0.0.apk`. Intermediate files and the local development key go in Git-ignored `.build/`. A fresh clone generates its own test key; it cannot update APKs signed with the distributed build's key. To use an existing local test key, pass `-KeyStore 'C:\path\test-key.p12'` with the test signing configuration expected by the script. Never publish private keys.
 
 ## Tests and validation
 

@@ -46,7 +46,14 @@ if (-not (Test-Path -LiteralPath $keyPath)) {
 Assert-Step
 & "$tools\apksigner.bat" verify --verbose $out
 Assert-Step
-& "$tools\aapt.exe" dump badging $out
+$taskBadging = @(& "$tools\aapt.exe" dump badging $out)
 Assert-Step
+$taskBadging | Write-Output
+if ($taskBadging -notcontains "application-label:'FM Lab'") {
+    throw 'Packaged application label must be FM Lab.'
+}
+if (-not ($taskBadging -match "^launchable-activity: name='br.local.fmlab.MainActivity'  label='FM Lab'")) {
+    throw 'Packaged launcher activity label must be FM Lab.'
+}
 Write-Output "APK built: $out"
 

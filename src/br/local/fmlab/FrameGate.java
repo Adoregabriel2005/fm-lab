@@ -6,17 +6,29 @@ package br.local.fmlab;
  */
 final class FrameGate {
   private int generation;
-  private boolean pending;
+  private boolean pending, failed;
 
   synchronized void reset(int value) {
     generation = value;
     pending = false;
+    failed = false;
   }
 
   synchronized boolean acquire(int value) {
-    if (value != generation || pending) return false;
+    if (value != generation || pending || failed) return false;
     pending = true;
     return true;
+  }
+
+  synchronized void fail(int value) {
+    if (value == generation) {
+      failed = true;
+      pending = false;
+    }
+  }
+
+  synchronized boolean failed() {
+    return failed;
   }
 
   synchronized void release(int value) {

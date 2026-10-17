@@ -103,6 +103,17 @@ final class AudioAnalysis {
             max = 0;
         int start = Math.max(1, (int) Math.ceil(low * n / rate)),
             end = Math.min(n / 2, (int) Math.ceil(high * n / rate));
+        if (low >= rate / 2.0) {
+          bands[b] = -90;
+          continue;
+        }
+        // A narrow log band may contain no bin center. Show its nearest resolved
+        // FFT bin rather than implying silence; this does not add resolution.
+        if (end <= start) {
+          start =
+              Math.max(1, Math.min(n / 2 - 1, (int) Math.round(Math.sqrt(low * high) * n / rate)));
+          end = start + 1;
+        }
         for (int k = start; k < end; k++)
           max = Math.max(max, Math.hypot(re[k], im[k]) * 2 / windowSum);
         bands[b] = (float) (max > 0 ? Math.max(-90, 20 * Math.log10(max)) : -90);

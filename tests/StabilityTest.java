@@ -142,6 +142,19 @@ public class StabilityTest {
     check(!gate.acquire(2));
     gate.release(2);
     check(gate.acquire(2));
+    check(!gate.failed());
+    gate.fail(1);
+    check(!gate.failed());
+    gate.fail(2);
+    check(gate.failed());
+    check(!gate.acquire(2));
+    gate.reset(3);
+    check(!gate.failed());
+    check(gate.acquire(3));
+    check(!ScreenAwakePolicy.keepAwake(false, false));
+    check(ScreenAwakePolicy.keepAwake(true, false));
+    check(ScreenAwakePolicy.keepAwake(false, true));
+    check(ScreenAwakePolicy.keepAwake(true, true));
     AudioAnalysis.Analyzer analyzer = new AudioAnalysis.Analyzer();
     short[] tone = new short[1470];
     for (int i = 0; i < tone.length; i++)
@@ -259,6 +272,13 @@ public class StabilityTest {
     check(l.finished && l.cancelled && l.restored);
     check(radio.mute == 0);
     check(Thread.interrupted());
+    short[] bass = new short[1470];
+    for (int i = 0; i < bass.length; i++)
+      bass[i] = (short) Math.round(16000 * Math.sin(2 * Math.PI * i / 1024));
+    AudioAnalysis lowBand = analyzer.analyze(bass, 44100);
+    check(lowBand.bands[0] > -10);
+    check(lowBand.bands[0] == lowBand.bands[1]);
+    check(analyzer.analyze(bass, 22050).bands[31] == -90);
     System.out.println(checks + " lifecycle, workspace and scan queue checks passed");
   }
 }

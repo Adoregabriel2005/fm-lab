@@ -32,6 +32,10 @@ final class AudioScope {
     listener = l;
   }
 
+  boolean canRestartAutomatically() {
+    return !frameGate.failed();
+  }
+
   boolean isRunning() {
     return active;
   }
@@ -140,6 +144,7 @@ final class AudioScope {
       if (active && token == generation)
         error = e.getClass().getSimpleName() + " · " + e.getMessage();
     } finally {
+      if (error != null) frameGate.fail(token);
       recorder = null;
       if (r != null) {
         try {
