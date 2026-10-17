@@ -42,13 +42,14 @@ final class AudioScope {
             if(r.getRecordingState()!=AudioRecord.RECORDSTATE_RECORDING)throw new IllegalStateException("A ROM não iniciou a captura FM");
             status(token,"Fonte FM direta · PCM 44,1 kHz · "+(stereo?"estéreo → mono":"mono"));
             int frames=RATE/30;
-            short[] buffer=new short[stereo?frames*2:frames];long lastFrame=0;
+            short[] buffer=new short[stereo?frames*2:frames];long lastFrame=0;AudioMeter meter=new AudioMeter();
             while(active&&token==generation){
                 int n=r.read(buffer,0,buffer.length);if(n<0)throw new IllegalStateException("Leitura FM recusada: "+n);if(n==0)continue;
+                meter.process(buffer,n,stereo?2:1,RATE);
                 long now=SystemClock.elapsedRealtime();if(now-lastFrame<30||!framePending.compareAndSet(false,true))continue;lastFrame=now;
                 int length=stereo?n/2:n;final short[] samples=new short[length];
                 if(stereo){for(int i=0;i<length;i++)samples[i]=(short)(((int)buffer[i*2]+buffer[i*2+1])/2);}else System.arraycopy(buffer,0,samples,0,length);
-                final AudioAnalysis analysis=AudioAnalysis.analyze(samples,RATE);
+                final AudioAnalysis analysis=AudioAnalysis.analyze(samples,RATE).withMeter(meter.snapshot());
                 main.post(new Runnable(){public void run(){try{if(active&&token==generation)listener.onFrame(samples,RATE,analysis);}finally{framePending.set(false);}}});
             }
         }catch(Exception e){if(active&&token==generation)error=e.getClass().getSimpleName()+" · "+e.getMessage();}

@@ -1,5 +1,15 @@
 # Changelog
 
+## 0.9
+
+- Guided 10-second antenna A/B comparison using mean raw SINR and variation, with freshness/coverage validation and invalidation on state changes.
+- Eight-second, 32-band audio spectrogram and waveform/spectrum/spectrogram freezing; meters and alerts stay live.
+- Continuous PCM digital meters independent of UI frame delivery: 300 ms exponential RMS, sample peak, 1-second peak hold, 20 dB/s decay, and capture-session full-scale sample counts.
+- Measure stereo PCM channels before mono downmix when stereo fallback is available.
+- Oscilloscope rising-zero trigger hysteresis, per-pixel extrema, and displayed-window RMS/peak.
+- Add 46 reception/metering/trigger checks (151 total). Build and tests pass; physical validation and performance testing remain pending.
+- Levels are dBFS, not calibrated analog VU/voltage; sample peaks are not intersample true peaks.
+
 ## 0.8
 
 - Separate the CAF Binder transport into `CafRadioBackend` behind an abstract internal contract.

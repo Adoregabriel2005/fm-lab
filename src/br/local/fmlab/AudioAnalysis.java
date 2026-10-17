@@ -2,9 +2,12 @@ package br.local.fmlab;
 
 /** PCM analysis; no Android dependencies. Peak/RMS are digital levels, not RF power. */
 final class AudioAnalysis {
+    final AudioMeter.Reading meter;
     final float[] bands;
     final double rmsDb,peakPercent,clippedFraction,dominantHz;
-    AudioAnalysis(float[] b,double r,double p,double c,double f){bands=b;rmsDb=r;peakPercent=p;clippedFraction=c;dominantHz=f;}
+    AudioAnalysis(float[] b,double r,double p,double c,double f){this(b,r,p,c,f,null);}
+    AudioAnalysis withMeter(AudioMeter.Reading m){return new AudioAnalysis(bands,rmsDb,peakPercent,clippedFraction,dominantHz,m);}
+    private AudioAnalysis(float[] b,double r,double p,double c,double f,AudioMeter.Reading m){meter=m;bands=b;rmsDb=r;peakPercent=p;clippedFraction=c;dominantHz=f;}
     static AudioAnalysis analyze(short[] pcm,int rate){
         int n=1024;double energy=0,peak=0;int clipped=0;
         for(short v:pcm){double x=v/32768.0;energy+=x*x;peak=Math.max(peak,Math.abs(x));if(Math.abs((int)v)>=32700)clipped++;}

@@ -15,7 +15,7 @@ $tools = Join-Path $Sdk "build-tools\$BuildTools"
 $android = Join-Path $Sdk "platforms\$Platform\android.jar"
 $dist = Join-Path $PSScriptRoot 'dist'
 New-Item -ItemType Directory -Force -Path $dist | Out-Null
-$out = Join-Path $dist 'FM-Lab-0.8-teste.apk'
+$out = Join-Path $dist 'FM-Lab-0.9-teste.apk'
 New-Item -ItemType Directory -Force -Path "$build\classes","$build\dex" | Out-Null
 $env:TEMP = $build
 $env:TMP = $build

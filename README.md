@@ -26,6 +26,18 @@ See the [device support matrix, requirements, and implementation roadmap](docs/D
 
 Please keep the factory radio installed. Hardware FM support alone does not guarantee that another app can access it. Each model/ROM and capability must be validated separately.
 
+## What makes FM Lab different (0.9)
+
+The aim is to help you understand and compare actual reception, beyond tuning and station presets:
+
+- **Guided antenna A/B comparison:** capture A for 10 seconds, move the headphone cable, then capture B on the same requested frequency. Compare mean raw SINR and its standard deviation. It rejects insufficient/stale trials and clears the reference on tuning/state resets or leaving the app. This is not a controlled laboratory experiment: changing interference and propagation can affect the result, so repeat it.
+- **Audio spectrogram:** eight seconds of 32-band FFT history from 43 Hz to 20 kHz, grouped into 100 ms time buckets. It shows changing audio content, not the RF spectrum or adjacent stations.
+- **Freeze waveform/spectrum/spectrogram:** inspect a captured visual while live digital meters and alerts continue. This does not record or pause playback.
+- **Continuous digital level meters:** process every PCM block delivered by AudioRecord, independently of drawing/FFT frame delivery. RMS uses a 300 ms exponential mean-square response; sample peaks have a 1-second hold followed by 20 dB/s decay. Exact full-scale PCM samples are counted for the capture session.
+- **More faithful oscilloscope rendering:** rising zero trigger with arming hysteresis, per-pixel extrema for dense waveforms, and window RMS/peak calculated from the displayed sample range.
+
+These changes are experimental; the new UI, drawing performance, and end-to-end audio measurements still need physical-device validation.
+
 ## Features
 
 - Requested tuning range of **76–108 MHz**, including extended FM, subject to native service and hardware limits.
@@ -128,7 +140,7 @@ Toolchain used: JDK 25.0.3, Android SDK Platform 34, Build Tools 36.0.0. Java ta
 .\build.ps1 -Sdk 'C:\Android\Sdk' -Java 'C:\Program Files\Android\Android Studio\jbr'
 ```
 
-Output: `dist/FM-Lab-0.8-teste.apk`. Intermediate files and the local development key go in Git-ignored `.build/`. A fresh clone generates its own test key; it cannot update APKs signed with the distributed build's key. To use an existing local test key, pass `-KeyStore 'C:\path\test-key.p12'` with the test signing configuration expected by the script. Never publish private keys.
+Output: `dist/FM-Lab-0.9-teste.apk`. Intermediate files and the local development key go in Git-ignored `.build/`. A fresh clone generates its own test key; it cannot update APKs signed with the distributed build's key. To use an existing local test key, pass `-KeyStore 'C:\path\test-key.p12'` with the test signing configuration expected by the script. Never publish private keys.
 
 ## Tests and validation
 
@@ -144,6 +156,16 @@ The original 97 automated checks cover known-tone FFT, amplitude, DC, silence, m
 
 Version 0.8 adds eight backend selection checks (105 total). Its adapter refactor, discovery UI, and API 21/22 runtime behavior still require physical-device validation.
 
+### Reading the new meters
+
+Levels use **dBFS**, referenced to signed 16-bit PCM full scale. A full-scale sine has approximately −3.01 dBFS RMS; a half-scale sine has approximately −9.03 dBFS RMS. The 300 ms display has startup/settling behavior and is not a calibrated analog VU meter or a claim of standards compliance. Peak means **sample peak**, not reconstructed intersample true peak. Full-scale counts are digital-limit observations, not proof of where analog distortion occurred.
+
+When stereo PCM fallback is available, meters read L/R before mono downmix so opposite-phase channels do not cancel in the channel meters. The waveform, FFT, and spectrogram still show the mono signal. Native stereo reception events remain a separate RF measurement. The mono capture path does not create independent L/R channels.
+
+The oscilloscope uses nominal 44.1 kHz PCM with a fixed full-scale vertical range and 5/10/20 ms windows. It is a framed display, not a lossless waveform recording. Graph freezing does not freeze meters. Gain, routing, firmware processing, or resampling can influence captured digital levels; these readings are not calibrated input voltage, FM deviation, or transmitter modulation.
+
+Version 0.9 adds 22 A/B trial checks and 24 continuous metering/trigger checks, bringing the total to **151**. Tests include known sine RMS, the analytical 300 ms response, full-scale counts, UI-skipped block peaks, peak hold/decay, and anti-phase stereo channel preservation. These mathematical tests do not validate the vendor capture path or screen behavior on a physical phone.
+
 ## Architecture
 
 - `RadioBridge` / `CafRadioBackend`: internal operation contract and analyzed CAF Binder adapter.
@@ -153,7 +175,9 @@ Version 0.8 adds eight backend selection checks (105 total). Its adapter refacto
 - `BandPlan`: tuning limits and scan channel alignment.
 - `AudioScope` / `AudioAnalysis`: direct FM capture and PCM analysis.
 - `LabFeatures` / `Measurement`: favorites, named measurements, logging, and CSV.
-- `MainActivity`, `ScopeView`, `SpectrumView`, `SignalPlot`: interface and graphs.
+- `ReceptionTrial`: validated 10-second A/B raw SINR trials.
+- `AudioMeter` / `LevelMeterView`: continuous digital metering and live level display.
+- `MainActivity`, `ScopeTrigger`, `ScopeView`, `SpectrumView`, `SpectrogramView`, `SignalPlot`: interface and graphs.
 
 ## License
 
