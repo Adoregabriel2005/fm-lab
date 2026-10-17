@@ -76,7 +76,7 @@ public final class MainActivity extends Activity implements RadioEvents.Listener
   private boolean compact;
   private View audioPanel, testsPanel, dataPanel;
 
-  private final StringBuilder log = new StringBuilder("FM Lab 0.10 | GT-I9195 / Android 7.1.2\n");
+  private final StringBuilder log = new StringBuilder();
   private final ArrayDeque<Integer> history = new ArrayDeque<Integer>();
   private volatile int bindingEpoch = 0;
   private int scanEpoch = 0;
@@ -89,6 +89,14 @@ public final class MainActivity extends Activity implements RadioEvents.Listener
 
   private int dp(int n) {
     return (int) (getResources().getDisplayMetrics().density * n + .5f);
+  }
+
+  private String appVersion() {
+    try {
+      return getPackageManager().getPackageInfo(getPackageName(), 0).versionName;
+    } catch (PackageManager.NameNotFoundException e) {
+      return "unknown";
+    }
   }
 
   private void record(String s) {
@@ -175,6 +183,8 @@ public final class MainActivity extends Activity implements RadioEvents.Listener
 
   public void onCreate(Bundle saved) {
     super.onCreate(saved);
+    final String release = appVersion();
+    record("FM Lab " + release);
     prefs = getSharedPreferences("fmlab", 0);
     if (prefs.getInt("sinrEncoding", 0) != 1)
       prefs.edit().remove("scanResults").putInt("sinrEncoding", 1).apply();
@@ -204,7 +214,7 @@ public final class MainActivity extends Activity implements RadioEvents.Listener
     TextView brand = text("FM LAB", 28, ACCENT);
     brand.setTypeface(null, Typeface.BOLD);
     header.addView(brand, new LinearLayout.LayoutParams(0, -2, 1));
-    TextView chip = text("LIVE · 0.10", 11, MUTED);
+    TextView chip = text("v" + release, 11, MUTED);
     chip.setGravity(Gravity.RIGHT | Gravity.CENTER_VERTICAL);
     header.addView(chip);
     label(body, "RECEPÇÃO • EMISSORA • ÁUDIO", 10, MUTED).setLetterSpacing(.14f);

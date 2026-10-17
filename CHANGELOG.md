@@ -1,5 +1,13 @@
 # Changelog
 
+## 1.0.0-rc1
+
+- Derive the displayed version and diagnostics header from installed package metadata.
+- Derive the APK filename from manifest versionName to avoid release naming drift.
+- Clean up build/test script messages and add an explicit physical release-validation checklist.
+- VersionCode 11; same signing certificate as 0.10. Build/signature/packaging and 204 automated checks pass.
+- Release candidate only: physical regression, upgrade/data preservation, export, and sustained-use checks remain pending.
+
 ## 0.10
 
 - Serialize scan/control work through one bounded worker and synchronize CAF transport calls.

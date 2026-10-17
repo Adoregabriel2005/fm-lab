@@ -26,6 +26,12 @@ See the [device support matrix, requirements, and implementation roadmap](docs/D
 
 Please keep the factory radio installed. Hardware FM support alone does not guarantee that another app can access it. Each model/ROM and capability must be validated separately.
 
+## 1.0 release candidate
+
+**1.0.0-rc1 is a release candidate, not a stable certification.** It keeps the 0.10 stability work and makes version labels, diagnostics, and APK filenames derive from package/manifest metadata. Its signature matches 0.10, so an in-place upgrade is eligible; actual data preservation still needs a device test.
+
+Build, signature, packaging checks, and all 204 automated checks pass. Physical S4 Mini regression and sustained-use testing are still pending. See the [release validation checklist](docs/RELEASE_VALIDATION.md). The candidate does not expand verified tuner compatibility.
+
 ## Stability and cleanup (0.10)
 
 - Scanning and ordinary native radio work now share a bounded serial worker. CAF transactions are also synchronized, and queued controls are ignored if a scan started or the bridge changed.
@@ -151,7 +157,7 @@ Toolchain used: JDK 25.0.3, Android SDK Platform 34, Build Tools 36.0.0. Java ta
 .\build.ps1 -Sdk 'C:\Android\Sdk' -Java 'C:\Program Files\Android\Android Studio\jbr'
 ```
 
-Output: `dist/FM-Lab-0.10-teste.apk`. Intermediate files and the local development key go in Git-ignored `.build/`. A fresh clone generates its own test key; it cannot update APKs signed with the distributed build's key. To use an existing local test key, pass `-KeyStore 'C:\path\test-key.p12'` with the test signing configuration expected by the script. Never publish private keys.
+Output: `dist/FM-Lab-1.0.0-rc1.apk`. Intermediate files and the local development key go in Git-ignored `.build/`. A fresh clone generates its own test key; it cannot update APKs signed with the distributed build's key. To use an existing local test key, pass `-KeyStore 'C:\path\test-key.p12'` with the test signing configuration expected by the script. Never publish private keys.
 
 ## Tests and validation
 

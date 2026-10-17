@@ -15,12 +15,15 @@ $tools = Join-Path $Sdk "build-tools\$BuildTools"
 $android = Join-Path $Sdk "platforms\$Platform\android.jar"
 $dist = Join-Path $PSScriptRoot 'dist'
 New-Item -ItemType Directory -Force -Path $dist | Out-Null
-$out = Join-Path $dist 'FM-Lab-0.10-teste.apk'
+[xml]$taskManifest = Get-Content -LiteralPath "$PSScriptRoot\AndroidManifest.xml" -Raw
+$taskVersion = $taskManifest.manifest.GetAttribute('versionName', 'http://schemas.android.com/apk/res/android')
+if ($taskVersion -notmatch '^[A-Za-z0-9._-]+$') { throw 'Invalid manifest versionName.' }
+$out = Join-Path $dist ("FM-Lab-" + $taskVersion + '.apk')
 New-Item -ItemType Directory -Force -Path "$build\classes","$build\dex" | Out-Null
 $env:TEMP = $build
 $env:TMP = $build
-if (-not (Test-Path -LiteralPath $android)) { throw "SDK nÃƒÂ£o encontrado em $Sdk. Informe -Sdk com o caminho do Android SDK." }
-function Assert-Step { if ($LASTEXITCODE -ne 0) { throw "Ferramenta falhou: cÃƒÂ³digo $LASTEXITCODE" } }
+if (-not (Test-Path -LiteralPath $android)) { throw "Android SDK not found at $Sdk. Specify -Sdk." }
+function Assert-Step { if ($LASTEXITCODE -ne 0) { throw "Tool failed with exit code $LASTEXITCODE" } }
 $sources = @(Get-ChildItem -LiteralPath (Join-Path $PSScriptRoot 'src') -Recurse -Filter '*.java' | ForEach-Object {$_.FullName})
 & "$Java\bin\javac.exe" -encoding UTF-8 --release 8 -classpath $android -d "$build\classes" @sources
 Assert-Step
@@ -45,5 +48,5 @@ Assert-Step
 Assert-Step
 & "$tools\aapt.exe" dump badging $out
 Assert-Step
-Write-Output "APK gerado: $out"
+Write-Output "APK built: $out"
 
